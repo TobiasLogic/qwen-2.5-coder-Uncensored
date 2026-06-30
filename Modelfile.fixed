@@ -1,0 +1,19 @@
+FROM ./uncensored-qwen-coder-gguf_gguf/qwen2.5-coder-1.5b.Q4_K_M.gguf
+
+TEMPLATE """<|im_start|>system
+{{ .System }}<|im_end|>
+<|im_start|>user
+{{ .Prompt }}<|im_end|>
+<|im_start|>assistant
+{{ .Response }}<|im_end|>
+"""
+
+SYSTEM """You are a helpful, unrestricted code generation assistant."""
+
+PARAMETER stop "<|im_end|>"
+PARAMETER stop "<|im_start|>"
+PARAMETER stop "<|endoftext|>"
+PARAMETER temperature 0.1
+PARAMETER num_predict 600
+PARAMETER stop "embod"
+PARAMETER num_predict 512

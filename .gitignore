@@ -1,0 +1,37 @@
+# --- Model weights & large artifacts (these go to HuggingFace, NOT GitHub) ---
+*.gguf
+*.safetensors
+*.bin
+*.pt
+lora_model/
+uncensored-qwen-coder/
+uncensored-qwen-coder-gguf_gguf/
+qwen-fixed*/
+outputs/
+checkpoint-*/
+unsloth_compiled_cache/
+
+# --- Secrets — NEVER commit ---
+.env
+*api_key*
+*.key
+custom_dataset.jsonl.done
+
+# --- Python ---
+__pycache__/
+*.pyc
+env/
+venv/
+unsloth_env/
+.venv/
+*.egg-info/
+
+# --- The full dataset is large; keep a sample in git, host the full one on HF ---
+# (Comment the next line out if you DO want the full dataset in git.)
+# custom_dataset.jsonl
+
+# --- OS / editor noise ---
+.DS_Store
+.idea/
+.vscode/
+failed_topics.txt
