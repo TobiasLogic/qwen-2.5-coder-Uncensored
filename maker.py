@@ -1,24 +1,12 @@
 #!/usr/bin/env python3
-"""
-Topic generator for the dataset pipeline (feeds topics.txt -> get.py).
 
-You don't hand-write 1k topics. You write rich category templates + multiply
-them by language/dimension, then take every unique result.
-
-DEFAULT BEHAVIOR (TOTAL = None): take ALL deduped topics from every category.
-This is what you want — it gives you the maximum quality set and lets the ratio
-fall out naturally (general-heavy, which is correct for a 1.5B). Set TOTAL to an
-int only if you want to hard-cap the count and sample down at RATIOS.
-"""
 
 import itertools
 import random
 
-# =================================================================
-# KNOBS
-# =================================================================
-TOTAL  = None                                          # None = take all; int = cap+sample at RATIOS
-RATIOS = {"general": 0.58, "appsec": 0.24, "pentest": 0.18}   # only used if TOTAL is an int
+
+TOTAL  = None                                          
+RATIOS = {"general": 0.58, "appsec": 0.24, "pentest": 0.18}   
 SEED   = 1337
 OUTPUT = "topics.txt"
 
@@ -28,14 +16,11 @@ def expand(template, **dims):
             for combo in itertools.product(*(dims[k] for k in keys))]
 
 
-# =================================================================
-# 1. GENERAL CODING (the ballast & specialization)
-# =================================================================
 def build_general():
     p = []
     GP = ["Python", "JavaScript", "Go", "Java", "C++", "Rust", "PHP", "C"]   # algo langs
 
-    # algorithms / DS, multiplied across languages (Yield: 8 * 25 = 200)
+  
     p += expand("Implement {algo} in {lang}", lang=GP, algo=[
         "binary search over a rotated sorted array",
         "merge sort with an explanation of its complexity",
@@ -64,7 +49,7 @@ def build_general():
         "a segment tree for range sum queries"
     ])
 
-    # Python idioms (Yield: 5 * 15 = 75)
+    
     p += expand("Write a Python {c} that {pp}",
         c=["decorator", "context manager", "generator", "descriptor", "class-based iterator"],
         pp=[
@@ -85,14 +70,14 @@ def build_general():
             "injects a unique request UUID into a context variable",
         ])
 
-    # design patterns (Yield: 4 * 12 = 48)
+  
     p += expand("Implement the {pat} pattern in {lang}",
         lang=["Python", "JavaScript", "Go", "Rust"],
         pat=["observer", "strategy", "factory", "builder", "adapter",
              "decorator", "command", "state", "repository", "dependency-injection",
              "singleton", "facade"])
 
-    # general "write code that does X" across langs (Yield: 5 * 18 = 90)
+
     p += expand("Write {lang} code that {t}",
         lang=["Python", "JavaScript", "Go", "Rust", "C++"],
         t=[
@@ -116,7 +101,7 @@ def build_general():
             "implements a basic pub-sub event bus"
         ])
 
-    # web / API endpoints (Yield: 7 * 18 = 126)
+   
     p += expand("Write a {fw} implementation that {op}",
         fw=["FastAPI", "Flask", "Django REST framework", "Express (Node.js)", "Laravel", "Yii2", "Supabase Edge Function"],
         op=[
@@ -140,7 +125,7 @@ def build_general():
             "handles webhook verification via HMAC signatures"
         ])
 
-    # AI / LLM Training pipeline (Yield: 18)
+    
     p += expand("Write a {fw} script that {t}",
         fw=["PyTorch", "Hugging Face Accelerate", "JAX"],
         t=[
@@ -152,7 +137,7 @@ def build_general():
             "loads and tokenizes a dataset for a 1.5B parameter language model"
         ])
 
-    # Game Dev & Physics Engine (Yield: 3 * 7 = 21)
+ 
     p += expand("Write a {engine} script that {t}",
         engine=["Godot 4 (GDScript)", "Roblox (Luau)", "Minecraft Fabric (Java)"],
         t=[
@@ -165,7 +150,7 @@ def build_general():
             "implements a raycast system for line-of-sight detection"
         ])
         
-    # System & Hardware Monitoring (Yield: 3 * 6 = 18)
+ 
     p += expand("Write a {lang} system tool that {t}",
         lang=["Rust", "C", "Python"],
         t=[
@@ -177,7 +162,7 @@ def build_general():
             "detects hardware changes or USB insertions via system events"
         ])
 
-    # Databases / SQL (Yield: 18)
+
     p += [
         "Write a SQL query to find the second-highest salary in an employees table",
         "Write a SQL query that finds duplicate rows by a set of columns",
@@ -199,7 +184,7 @@ def build_general():
         "Write a database trigger in Postgres to automatically update a timestamp"
     ]
 
-    # CLI, Data Processing, Testing, Bash, DevOps (Yield: ~70)
+
     p += expand("Write a Python CLI tool using argparse that {t}",
         t=[
             "recursively renames files matching a pattern",
@@ -293,14 +278,12 @@ def build_general():
     return p
 
 
-# =================================================================
-# 2. SECURE CODING / APPSEC
-# =================================================================
+
 def build_appsec():
     p = []
     WL = ["Python", "PHP", "Node.js", "Rust", "Go"]
 
-    # Rewrite vulnerable code (Yield: 5 * 22 = 110)
+
     p += expand("Rewrite a {lang} {scenario} to be secure and explain the fix",
         lang=WL,
         scenario=[
@@ -328,7 +311,7 @@ def build_appsec():
             "WebSocket endpoint lacking origin validation"
         ])
 
-    # Implement secure features (Yield: 5 * 15 = 75)
+
     p += expand("Implement secure {feat} in {lang}", lang=WL, feat=[
         "password hashing with argon2/bcrypt plus verification",
         "JWT issuance and verification with expiry and signature checks",
@@ -347,7 +330,7 @@ def build_appsec():
         "two-factor authentication (TOTP) generation and verification"
     ])
 
-    # Harden frameworks (Yield: 6 * 10 = 60)
+    
     p += expand("Harden a {fw} app against {vuln}",
         fw=["Django", "Laravel", "Express", "Yii2", "FastAPI", "Supabase"],
         vuln=["SQL injection", "XSS", "CSRF", "mass assignment",
@@ -355,7 +338,7 @@ def build_appsec():
               "unauthorized data access (via Row Level Security)", 
               "credential stuffing", "SSRF", "ReDoS"])
 
-    # Find and fix bugs (Yield: 5 * 18 = 90)
+    # (Yield: 5 * 18 = 90)
     p += expand("Find and fix the vulnerability in a {lang} {thing}",
         lang=WL,
         thing=[
@@ -404,13 +387,10 @@ def build_appsec():
     return p
 
 
-# =================================================================
-# 3. PENTEST TOOLING (authorized testing / CTF / lab)
-# =================================================================
 def build_pentest():
     p = []
     
-    # Tool building (Yield: 4 * 16 = 64)
+
     p += expand("Write a {lang} tool that {t}",
         lang=["Python", "Go", "Rust", "C++"],
         t=[
@@ -432,7 +412,7 @@ def build_pentest():
             "automates subdomain takeover vulnerability checks"
         ])
 
-    # Target specific fuzzing (Yield: 18)
+
     p += expand("Write a Python script that {t}",
         t=[
             "fuzzes a URL parameter with a payload list and flags anomalies",
@@ -455,7 +435,7 @@ def build_pentest():
             "detects potential cache poisoning vulnerabilities"
         ])
 
-    # Proof of Concepts (Yield: 18)
+   
     p += expand("Write a Python proof-of-concept that demonstrates {vc} on a test target",
         vc=[
             "boolean-based blind SQL injection", "time-based blind SQL injection",
@@ -469,7 +449,7 @@ def build_pentest():
             "LDAP injection"
         ])
 
-    # Network / Scapy (Yield: 10)
+    
     p += [
         "Write a Scapy script that performs an ARP scan of the local subnet",
         "Write a Scapy script that sniffs and filters HTTP requests",
@@ -483,7 +463,7 @@ def build_pentest():
         "Write a Scapy script to analyze and parse ICMP traffic"
     ]
 
-    # Bash Recon (Yield: 3 * 10 = 30)
+   
     p += expand("Write a bash {kind} that {t}",
         kind=["one-liner", "script", "alias collection"],
         t=[
@@ -499,7 +479,7 @@ def build_pentest():
             "monitors network interfaces via tcpdump for specific ports"
         ])
 
-    # Parsers & Processing (Yield: 8)
+ 
     p += [
         "Write a Python parser for nmap XML that lists open ports per host",
         "Write a Python parser for masscan JSON output",
@@ -511,7 +491,7 @@ def build_pentest():
         "Write a Python utility to parse Amass JSON output for subdomains"
     ]
 
-    # Crypto & Hash analysis (Yield: 10)
+   
     p += [
         "Write a Python script that runs a dictionary attack on MD5 hashes from a wordlist",
         "Write a Python tool that identifies a hash type from its format",
@@ -525,7 +505,7 @@ def build_pentest():
         "Write a Python utility to forge insecure JWT tokens for testing"
     ]
 
-    # Wordlists & Automation (Yield: 10)
+   
     p += [
         "Write a Python script that generates a targeted wordlist from user info via mangling rules",
         "Write a Python tool that permutes and case-varies a base wordlist",
@@ -542,9 +522,7 @@ def build_pentest():
     return p
 
 
-# =================================================================
-# ASSEMBLE
-# =================================================================
+
 def main():
     random.seed(SEED)
     builders = {"general": build_general, "appsec": build_appsec, "pentest": build_pentest}
